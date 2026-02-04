@@ -2,12 +2,13 @@ from models.main import load
 
 model, vectorizer, label_encoder = load()
 
-while True:
-    test_text = [input('Enter description: ')]
-    if not test_text[0].strip():
-        break
-
-    X_new = vectorizer.transform(test_text)
+def get_category(query):
+    X_new = vectorizer.transform([query])
     pred = model.predict(X_new)
+    return label_encoder.inverse_transform(pred)[0]
 
-    print(label_encoder.inverse_transform(pred))
+if __name__ == "__main__":
+    while True:
+        query = input('Enter description: ')
+        category = get_category(query)
+        print(category)
