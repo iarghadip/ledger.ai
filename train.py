@@ -42,3 +42,36 @@ print("Accuracy:", accuracy)
 from models.main import save
 
 save(model, vectorizer, label_encoder)
+
+import pandas as pd
+import numpy as np
+
+feature_names = vectorizer.get_feature_names_out()
+
+class_labels = label_encoder.classes_
+
+if len(class_labels) == 2:
+    coefficients = model.coef_[0]
+
+    top_positive = np.argsort(coefficients)[-10:]
+    top_negative = np.argsort(coefficients)[:10]
+    
+    print(f"\n--- Top indicators for '{class_labels[1]}' (Positive Class) ---")
+    for i in top_positive:
+        print(f"{feature_names[i]}: {coefficients[i]:.4f}")
+        
+    print(f"\n--- Top indicators for '{class_labels[0]}' (Negative Class) ---")
+    for i in top_negative:
+        print(f"{feature_names[i]}: {coefficients[i]:.4f}")
+
+else:
+    print("\n--- Top 10 Keywords per Category ---")
+    for i, class_label in enumerate(class_labels):
+        
+        class_coefficients = model.coef_[i]
+        
+        top_indices = np.argsort(class_coefficients)[-10:][::-1]
+        
+        print(f"\nCategory: {class_label}")
+        for idx in top_indices:
+            print(f"  {feature_names[idx]} ({class_coefficients[idx]:.4f})")
