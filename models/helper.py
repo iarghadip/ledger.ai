@@ -6,13 +6,13 @@ import pickle
 import shutil
 from pathlib import Path
 
-def print_deployed():
+def print_deployed(silent=False):
 	
 	version, _ = resolve_deployed('load')
 	
 	if version == 'version_0':
 		print(f'Warning: No model is currently deployed.')
-	else:
+	elif not silent:
 		print(f'Success: Deployed model {version} as primary model.')
 
 def resolve_deployed(type):
@@ -114,7 +114,7 @@ def load_model():
 	
 	version, folder = resolve_deployed('load')
 	
-	print_deployed()
+	print_deployed(silent=True)
 	
 	if folder.exists():
 		
@@ -150,3 +150,9 @@ def revert_model():
 	
 	print(f'Success: Deleted old model {version} from deployment.')
 	print_deployed()
+
+def run_model(query):
+	version, model, vectorizer, encoder = load_model()
+	X_new = vectorizer.transform([query])
+	pred = model.predict(X_new)
+	return version, encoder.inverse_transform(pred)[0]

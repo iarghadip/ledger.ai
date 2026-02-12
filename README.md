@@ -72,7 +72,14 @@ Enter description: bought clothes.
 
 ---
 
-## Friend Suggestions
+## Friend's Suggestions
 
 - **Word2Vec:** Use embeddings to capture semantic similarity between words (e.g., “Had banana” vs “Bought banana”)  
-- **Representative LLM:** Use a small fine-tuned language model to handle **complex description generation** and context-aware classification  
+- **Representative LLM:** Use a small fine-tuned language model to handle **complex description generation** and context-aware classification
+
+## TODO:
+```
+# on feedback user will call /trainers/online/data/helper.py -> save_data()
+# a background job will run /models/helper.py -> create_version() # this creates the task in json
+# the background job then runs /trainers/online/train.py
+```
