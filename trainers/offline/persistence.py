@@ -19,15 +19,17 @@ def load():
         encoder = pickle.load(f)
     
     print(f"Success: Deployed model {version} as primary model.")
-    return model, vectorizer, encoder
+    return version, model, vectorizer, encoder
 
 def save(model, vectorizer, encoder):
 
     version, folder = resolve('load')
 
     if version != "version_1":
-        print(f"Warning: Skipped model retraining as a newer version ${version} already exists.")
+        print(f"Warning: Skipped model retraining as a newer version {version} already exists.")
         return
+    
+    os.makedirs(folder, exist_ok=True)
     
     with open(folder / "model.pkl", "wb") as f:
         pickle.dump(model, f)

@@ -1,3 +1,5 @@
+import os
+import shutil
 from pathlib import Path
 
 def resolve(type):
@@ -18,13 +20,22 @@ def resolve(type):
     
     if type == 'save':
         number = number + 1
-
-    output = dict(
-        name=f"version_{number}"
-        folder=folder / f"version_{number}"
-    )
+    
+    version=f"version_{number}"
+    folder=folder / f"version_{number}"
     
     if type == 'save':
-        os.makedirs(output.get('folder'), exist_ok=True)
+        os.makedirs(folder, exist_ok=True)
     
-    return output
+    return version, folder
+
+def rollback():
+
+    version, folder = resolve('load')
+
+    if not folder.exists():
+        print(f"Warning: Skipped model rollback as no previous version exists.")
+        return
+
+    shutil.rmtree(folder)
+    print(f"Success: Deleted old model {version} as primary model.")

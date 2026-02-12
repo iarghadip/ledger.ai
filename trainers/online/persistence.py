@@ -19,7 +19,7 @@ def load():
         encoder = pickle.load(f)
     
     print(f"Success: Deployed model {version} as primary model.")
-    return model, vectorizer, encoder
+    return version, model, vectorizer, encoder
 
 def save(model, vectorizer, encoder):
 
