@@ -3,20 +3,37 @@ import json
 
 def load():
 
-    buffer = dict(
-        descriptions=[], 
-        categories=[]
-    )
+    descriptions = []
+    categories = []
 
-    for file in Path(__file__).parent.glob("*.json"):
-        with open(file, "r", encoding="utf-8") as f:
+    folder = Path(__file__).parent.parent.parent / "models" / "runtime.json"
+
+    if not folder.exists():
+        return descriptions, categories
+
+    with open(folder, "r", encoding="utf-8") as f:
+        runtime = json.load(f)
+    
+    next_entry = None
+    for entry in runtime:
+        if not entry.get("completed", False):
+            next_entry = entry
+            break
+
+    if not next_entry:
+        return descriptions, categories
+
+    folder = Path(__file__).parent
+    for file_name in next_entry["data"]:
+        file_path = folder / file_name
+        if not file_path.exists():
+            continue
+        with open(file_path, "r", encoding="utf-8") as f:
             for x in json.load(f):
-                buffer['descriptions']
-                    .append(x["Description"].strip().lower())
-                buffer['categories']
-                    .append(x["Category"].strip())
+                descriptions.append(x["Description"].strip().lower())
+                categories.append(x["Category"].strip())
 
-    return buffer
+    return descriptions, categories
 
 def save(category, amount, description):
 

@@ -1,78 +1,75 @@
-from .data.helper import load
-from sklearn.preprocessing import LabelEncoder
+from models.helper import resolve
 
-categories, descriptions = load()
+version, folder = resolve('load')
 
-encoder = LabelEncoder()
-y = encoder.fit_transform(categories)
+if version == "version_1":
 
-print(y)
+    from .data.helper import load
+    from sklearn.preprocessing import LabelEncoder
 
-from sklearn.feature_extraction.text import TfidfVectorizer
+    categories, descriptions = load()
 
-vectorizer = TfidfVectorizer(
-    lowercase=True,
-    stop_words=None,
-    ngram_range=(1, 2)
-)
+    encoder = LabelEncoder()
+    y = encoder.fit_transform(categories)
 
-X = vectorizer.fit_transform(descriptions)
+    print(y)
 
-print(X.shape)
+    from sklearn.feature_extraction.text import TfidfVectorizer
 
-from sklearn.model_selection import train_test_split
+    vectorizer = TfidfVectorizer(
+        lowercase=True,
+        stop_words=None,
+        ngram_range=(1, 2)
+    )
 
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
-)
+    X = vectorizer.fit_transform(descriptions)
 
-from sklearn.linear_model import LogisticRegression
+    print(X.shape)
 
-model = LogisticRegression(max_iter=1000)
-model.fit(X_train, y_train)
+    from sklearn.model_selection import train_test_split
 
-from sklearn.metrics import accuracy_score
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
+    from sklearn.linear_model import SGDClassifier
 
-print("Accuracy:", accuracy)
+    # Use SGDClassifier with log loss (like logistic regression) for incremental learning
+    model = SGDClassifier(loss='log_loss', max_iter=1000, tol=1e-3)
+    model.fit(X_train, y_train)
 
-from .persistence import save
+    from sklearn.metrics import accuracy_score
 
-save(model, vectorizer, encoder)
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
 
-import pandas as pd
-import numpy as np
+    print("Accuracy:", accuracy)
 
-feature_names = vectorizer.get_feature_names_out()
-
-class_labels = model.classes_
-
-if len(class_labels) == 2:
-    coefficients = model.coef_[0]
-
-    top_positive = np.argsort(coefficients)[-10:]
-    top_negative = np.argsort(coefficients)[:10]
+    from models.helper import save
     
-    #print(f"\n--- Top indicators for '{class_labels[1]}' (Positive Class) ---")
-    for i in top_positive:
-        pass
-        #print(f"{feature_names[i]}: {coefficients[i]:.4f}")
-        
-    #print(f"\n--- Top indicators for '{class_labels[0]}' (Negative Class) ---")
-    for i in top_negative:
-        pass
-        #print(f"{feature_names[i]}: {coefficients[i]:.4f}")
+    save(model, vectorizer, encoder)
+
+    # # Optional: Inspect top features
+    # import numpy as np
+    # feature_names = vectorizer.get_feature_names_out()
+    # class_labels = model.classes_
+    #
+    # if len(class_labels) == 2:
+    #     coefficients = model.coef_[0]
+    #
+    #     top_positive = np.argsort(coefficients)[-10:]
+    #     top_negative = np.argsort(coefficients)[:10]
+    #
+    #     for i in top_positive:
+    #         pass
+    #     for i in top_negative:
+    #         pass
+    #
+    # else:
+    #     for i, class_label in enumerate(class_labels):
+    #         class_coefficients = model.coef_[i]
+    #         top_indices = np.argsort(class_coefficients)[-10:][::-1]
+    #         pass
 
 else:
-    #print("\n--- Top 10 Keywords per Category ---")
-    for i, class_label in enumerate(class_labels):
-        
-        class_coefficients = model.coef_[i]
-        
-        top_indices = np.argsort(class_coefficients)[-10:][::-1]
-        
-        #print(f"\nCategory: {class_label}")
-        #for idx in top_indices:
-            #print(f"  {feature_names[idx]} ({class_coefficients[idx]:.4f})")
+    print(f"Warning: Skipped model retraining as a newer version {version} already exists.")
