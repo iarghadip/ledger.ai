@@ -55,7 +55,6 @@ def complete_version(version):
 def create_version():
 	
 	runtime = Path(__file__).parent / 'runtime.json'
-	os.makedirs(runtime, exist_ok=True)
 	
 	with open(runtime, 'r', encoding='utf-8') as f_runtime:
 		
