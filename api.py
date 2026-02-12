@@ -39,7 +39,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.get("/", response_model=SuccessResponse | ErrorResponse, response_model_exclude_none=True)
 def read_root(
-    query: Annotated[str, Query(min_length=5, max_length=20)]
+    query: Annotated[str, Query(min_length=5, max_length=30)]
 ):
     category = get_category(query)
     return SuccessResponse(
