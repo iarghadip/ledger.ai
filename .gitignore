@@ -2,3 +2,4 @@
 __pycache__
 /models/version_*
 /models/runtime.json
+ledger.ai.egg-info

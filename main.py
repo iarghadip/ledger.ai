@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from models.main import load
 
 model, vectorizer, label_encoder = load()

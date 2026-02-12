@@ -1,9 +1,10 @@
-# Step 1: Resolve model version
+#!/usr/bin/env python3
+
 from models.helper import resolve
 
-version, folder = resolve('load')
+version, _ = resolve('load')
 
-if version != "version_1":
+if version != 'version_0':
 
     # Step 2: Load existing model, vectorizer, encoder
     from models.helper import load as load_model

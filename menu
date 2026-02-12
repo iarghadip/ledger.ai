@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+pause() {
+    echo -e "\n$(printf -- '-%.0s' $(seq 1 $(tput cols)))\n"
+    read -rp "Press RETURN to continue..."
+}
+
+declare -A COMMANDS
+COMMANDS[1]="pip3 install -e .; pause"
+COMMANDS[2]="python3 -m trainers.offline.train; pause"
+COMMANDS[3]="python3 -c 'from models.helper import revert_model; revert_model()'; pause"
+COMMANDS[4]="uvicorn api:app --host $(ip route get 1 | awk '{print $7}') --port 8001 --reload"
+
+declare -A LABELS
+LABELS[1]="Install Dependencies"
+LABELS[2]="Train Offline Model"
+LABELS[3]="Revert Model Training"
+LABELS[4]="Start Model Server"
+
+while true; do
+    
+    clear; echo
+
+    for ((key=1; key<=${#COMMANDS[@]}; key++)); do
+        echo "$key) ${LABELS[$key]}"
+    done
+
+    echo -e "q) Quit Developer Menu\n"
+    
+    read -p "Select Option: " choice
+
+    if [[ "$choice" == "q" || "$choice" == "Q" ]]; then
+        exit 0
+    fi
+
+    if [[ -n "${COMMANDS[$choice]}" ]]; then
+        echo -e "\n$(printf -- '-%.0s' $(seq 1 $(tput cols)))\n"
+        eval "${COMMANDS[$choice]}"
+    else
+        echo -e "\n$(printf -- '-%.0s' $(seq 1 $(tput cols)))\n"
+        echo "Warning: You chose an invalid option."
+        pause
+    fi
+done

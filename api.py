@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from main import get_category
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
