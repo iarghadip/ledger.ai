@@ -8,14 +8,16 @@ pause() {
 declare -A COMMANDS
 COMMANDS[1]="pip3 install -e .; pause"
 COMMANDS[2]="python3 -m trainers.offline.train; pause"
-COMMANDS[3]="python3 -c 'from models.helper import revert_model; revert_model()'; pause"
-COMMANDS[4]="uvicorn api:app --host $(ip route get 1 | awk '{print $7}') --port 8001 --reload"
+COMMANDS[3]="python3 -m trainers.online.train; pause"
+COMMANDS[4]="python3 -c 'from models.helper import revert_model; revert_model()'; pause"
+COMMANDS[5]="uvicorn api:app --host $(ip route get 1 | awk '{print $7}') --port 8001 --reload"
 
 declare -A LABELS
 LABELS[1]="Install Dependencies"
 LABELS[2]="Train Offline Model"
-LABELS[3]="Revert Model Training"
-LABELS[4]="Start Model Server"
+LABELS[3]="Train Online Model"
+LABELS[4]="Revert Model Training"
+LABELS[5]="Start Model Server"
 
 while true; do
     
