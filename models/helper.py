@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import json
 import pickle
 import shutil
 from pathlib import Path
@@ -18,10 +19,10 @@ def resolve_deployed(type):
 	
 	number = 0
 	
-	for f in Path(__file__).parent.iterdir():
-		if f.is_dir() and f.name.startswith('version_'):
+	for v in Path(__file__).parent.iterdir():
+		if v.is_dir() and v.name.startswith('version_'):
 			try:
-				current = int(f.name.split('_')[1])
+				current = int(v.name.split('_')[1])
 				if current > number:
 					number = current
 			except (IndexError, ValueError):
@@ -32,70 +33,65 @@ def resolve_deployed(type):
 	
 	version = f'version_{number}'
 	folder = Path(__file__).parent / version
-	
-	if type == 'save':
-		os.makedirs(folder, exist_ok=True)
-		
-	return version, folder
+	if type == 'save': os.makedirs(folder, exist_ok=True)
 
-def create_version():
-	
-	runtime = Path(__file__).parent / 'runtime.json'
-	
-	if runtime.exists():
-		with open(runtime, 'r', encoding='utf-8') as f:
-			usage = json.load(f)
-	else:
-		usage = []
-		
-	used_files = set()
-	for entry in usage:
-		used_files.update(entry.get('data', []))
-		
-	folder = Path(__file__).parent.parent / 'trainers' / 'online' / 'data'
-	files = sorted(folder.glob('part_*.json'), key=lambda x: int(x.stem.split('_')[1]))
-	
-	files_to_use = []
-	for f in files:
-		if f.name in used_files:
-			continue
-		with open(f, 'r', encoding='utf-8') as jf:
-			data = json.load(jf)
-		if len(data) >= 100:
-			files_to_use.append(f.name)
-			
-	if not files_to_use:
-		return
-	
-	version, folder = resolve_deployed('save')
-	
-	usage.append(dict(
-		version=version,
-		data=files_to_use,
-		completed=False
-	))
-	
-	with open(runtime, 'w', encoding='utf-8') as f:
-		json.dump(usage, f, indent=4)
-		
-	print(f'Success: Queued new model {version} as primary model.')
+	return version, folder
 
 def complete_version(version):
 	
 	runtime = Path(__file__).parent / 'runtime.json'
+	os.makedirs(runtime, exist_ok=True)
 	
-	if not runtime.exists():
-		return
-	
-	with open(runtime, 'r', encoding='utf-8') as f:
-		usage = json.load(f)
+	with open(runtime, 'r', encoding='utf-8') as f_runtime:
+		usage = json.load(f_runtime)
 		
 	for entry in usage:
 		if entry['version'] == version:
 			entry['completed'] = True
 			
-	with open(runtime, 'w', encoding='utf-8') as f:
-		json.dump(usage, f, indent=4)
+	with open(runtime, 'w', encoding='utf-8') as f_runtime:
+		json.dump(usage, f_runtime, indent=4)
+
+def create_version():
+	
+	runtime = Path(__file__).parent / 'runtime.json'
+	os.makedirs(runtime, exist_ok=True)
+	
+	with open(runtime, 'r', encoding='utf-8') as f:
+		
+		usage = json.load(f)
+		used_files = set()
+		
+		for entry in usage:
+			used_files.update(entry.get('data', []))
+			
+		folder = Path(__file__).parent.parent / 'trainers' / 'online' / 'data'
+		files = sorted(folder.glob('part_*.json'), key=lambda x: int(x.stem.split('_')[1]))
+		files_to_use = []
+		
+		for f in files:
+			if f.name in used_files:
+				continue
+			with open(f, 'r', encoding='utf-8') as jf:
+				data = json.load(jf)
+			if len(data) >= 100:
+				files_to_use.append(f.name)
+				
+		if not files_to_use:
+			return
+		
+		version, folder = resolve_deployed('save')
+		
+		usage.append(dict(
+			version=version,
+			data=files_to_use,
+			completed=False
+		))
+		
+		with open(runtime, 'w', encoding='utf-8') as f:
+			json.dump(usage, f, indent=4)
+			
+		print(f'Success: Queued new model {version} as primary model.')
 
 def create_model(model, vectorizer, encoder):
 	
@@ -107,6 +103,8 @@ def create_model(model, vectorizer, encoder):
 		pickle.dump(vectorizer, f)
 	with open(folder / 'encoder.pkl', 'wb') as f:
 		pickle.dump(encoder, f)
+	
+	complete_version(version)
 		
 	print(f'Success: Created new model {version} for deployement.')
 	print_deployed()

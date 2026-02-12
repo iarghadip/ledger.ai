@@ -3,15 +3,14 @@
 from pathlib import Path
 import json
 
-def load():
+def load_data():
 
-    descriptions = []
-    categories = []
+    descriptions, categories = [], []
 
-    for file in Path(__file__).parent.glob("*.json"):
-        with open(file, "r", encoding="utf-8") as f:
-            for x in json.load(f):
-                descriptions.append(x["Description"].strip().lower())
-                categories.append(x["Category"].strip())
+    for data in Path(__file__).parent.glob('*.json'):
+        with open(data, 'r', encoding='utf-8') as f_data:
+            for t in json.load(f_data):
+                descriptions.append(t['Description'].strip().lower())
+                categories.append(t['Category'].strip())
 
     return descriptions, categories

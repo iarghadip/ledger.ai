@@ -19,7 +19,8 @@ LABELS[4]="Start Model Server"
 
 while true; do
     
-    clear; echo
+    clear
+    echo
 
     for ((key=1; key<=${#COMMANDS[@]}; key++)); do
         echo "$key) ${LABELS[$key]}"
@@ -41,4 +42,5 @@ while true; do
         echo "Warning: You chose an invalid option."
         pause
     fi
+    
 done

@@ -50,3 +50,7 @@ def read_root(
             "category": category
         }
     )
+    
+# on feedback user will call /trainers/online/data/helper.py -> save_data()
+# a background job will run /models/helper.py -> create_version() # this creates the task in json
+# the background job then runs /trainers/online/train.py
