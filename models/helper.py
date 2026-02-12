@@ -40,17 +40,18 @@ def resolve_deployed(type):
 def complete_version(version):
 	
 	runtime = Path(__file__).parent / 'runtime.json'
-	os.makedirs(runtime, exist_ok=True)
 	
-	with open(runtime, 'r', encoding='utf-8') as f_runtime:
-		usage = json.load(f_runtime)
-		
-	for entry in usage:
-		if entry['version'] == version:
-			entry['completed'] = True
+	if runtime.exists():
+		with open(runtime, 'r', encoding='utf-8') as f_runtime:
 			
-	with open(runtime, 'w', encoding='utf-8') as f_runtime:
-		json.dump(usage, f_runtime, indent=4)
+			usage = json.load(f_runtime)
+			
+			for entry in usage:
+				if entry['version'] == version:
+					entry['completed'] = True
+			
+			with open(runtime, 'w', encoding='utf-8') as f_runtime:
+				json.dump(usage, f_runtime, indent=4)
 
 def create_version():
 	
