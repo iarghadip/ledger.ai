@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 
+set -m
 LOG_FILE=$(mktemp)
 
 cleanup() {
-    if [[ -n "$BG_PID" ]]; then
-        kill "$BG_PID" 2>/dev/null
+    if [[ -n "$BG_PID" ]] && kill -0 "$BG_PID" 2>/dev/null; then
+        kill -TERM -"$BG_PID" 2>/dev/null
         wait "$BG_PID" 2>/dev/null
     fi
     rm -f "$LOG_FILE"
 }
 
-trap cleanup EXIT SIGINT SIGTERM
+trap cleanup EXIT SIGINT SIGTERM SIGHUP
 
 background() {
     sleep 60
