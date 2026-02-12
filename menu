@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
+LOG_FILE=$(mktemp)
+
 cleanup() {
     if [[ -n "$BG_PID" ]]; then
         kill "$BG_PID" 2>/dev/null
         wait "$BG_PID" 2>/dev/null
     fi
+    rm -f "$LOG_FILE"
 }
 
 trap cleanup EXIT SIGINT SIGTERM
@@ -12,7 +15,7 @@ trap cleanup EXIT SIGINT SIGTERM
 background() {
     python3 -c 'from models.helper import create_version; create_version()'
     python3 -m 'trainers.online.train'
-    sleep 60
+    sleep 300
 }
 
 pause() {
@@ -36,13 +39,22 @@ LABELS[4]="Revert Model Training"
 LABELS[5]="Start API Portal"
 LABELS[6]="Start CLI Portal"
 
-background &
+background > "$LOG_FILE" 2>&1 &
 BG_PID=$!
 
 while true; do
     
     clear
-    echo
+    
+    BG_OUTPUT=$(tail -n 5 "$LOG_FILE")
+    
+    if [[ -n "$BG_OUTPUT" ]]; then
+        echo -e "\n$(printf -- '-%.0s' $(seq 1 $(tput cols)))\n"
+        echo "$BG_OUTPUT"
+        echo -e "\n$(printf -- '-%.0s' $(seq 1 $(tput cols)))\n"
+    else
+        echo
+    fi
 
     for ((key=1; key<=${#COMMANDS[@]}; key++)); do
         echo "$key) ${LABELS[$key]}"
@@ -51,6 +63,10 @@ while true; do
     echo -e "q) Quit Developer Menu\n"
     
     read -p "Select Option: " choice
+    
+    if [[ $? -gt 128 ]]; then
+        continue
+    fi
 
     if [[ "$choice" == "q" || "$choice" == "Q" ]]; then
         exit 0
