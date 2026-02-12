@@ -3,18 +3,23 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="ledger.ai",
-    version="1.0.0",
-    description="Determine transaction category from transaction description.",
-    author="Arghadip Das",
+    name='ledger.ai',
+    version='1.0.0',
+    description='Determine transaction category from transaction description.',
+    author='Arghadip Das',
     packages=find_packages(),
     install_requires=[
-        "fastapi>=0.95.0",
-        "uvicorn>=0.22.0",
-        "scikit-learn>=1.2.0",
-        "pandas>=2.0.0",
-        "numpy>=1.24.0",
-        "pydantic>=2.0.0",
+        'fastapi>=0.95.0',
+        'uvicorn>=0.22.0',
+        'scikit-learn>=1.2.0',
+        'pandas>=2.0.0',
+        'numpy>=1.24.0',
+        'pydantic>=2.0.0',
     ],
-    python_requires=">=3.8",
+    python_requires='>=3.8',
 )
+
+import json
+
+with open('models/runtime.json', 'w') as f:
+    json.dump({}, f)

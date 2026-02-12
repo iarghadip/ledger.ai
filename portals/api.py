@@ -11,7 +11,7 @@ app = FastAPI()
 
 app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
-@app.get("/", response_model=SuccessResponse | ErrorResponse, response_model_exclude_none=True)
+@app.get('/', response_model=SuccessResponse | ErrorResponse, response_model_exclude_none=True)
 def read_root(
 	query: Annotated[str, Query(min_length=5, max_length=30)]
 ):

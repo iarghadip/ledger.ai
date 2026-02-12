@@ -15,6 +15,6 @@ class ErrorResponse(BaseModel):
 	@field_validator('message')
 	@classmethod
 	def prepend_error_tag(cls, v: str | None) -> str | None:
-		if v is not None and not v.startswith("Error: "):
-			return f"Error: {v}"
+		if v is not None and not v.startswith('Error: '):
+			return f'Error: {v}'
 		return v

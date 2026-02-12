@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 
+cleanup() {
+    if [[ -n "$BG_PID" ]]; then
+        kill "$BG_PID" 2>/dev/null
+        wait "$BG_PID" 2>/dev/null
+    fi
+}
+
+trap cleanup EXIT SIGINT SIGTERM
+
+background() {
+    python3 -c 'from models.helper import create_version; create_version()'
+    python3 -m 'trainers.online.train'
+    sleep 60
+}
+
 pause() {
     echo -e "\n$(printf -- '-%.0s' $(seq 1 $(tput cols)))\n"
     read -rp "Press RETURN to continue..."
@@ -20,6 +35,9 @@ LABELS[3]="Train Online Model"
 LABELS[4]="Revert Model Training"
 LABELS[5]="Start API Portal"
 LABELS[6]="Start CLI Portal"
+
+background &
+BG_PID=$!
 
 while true; do
     
