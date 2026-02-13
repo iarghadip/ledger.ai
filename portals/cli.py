@@ -10,7 +10,7 @@ try:
             
         version, category = run_model(query)
         
-        print(f'\n{version}: {str(category)}\n')
+        print(f'\n{version}: {category}\n')
 
 except KeyboardInterrupt:
     sys.exit(0)

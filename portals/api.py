@@ -20,6 +20,6 @@ def read_root(
 		body=dict(
 			version=version,
 			description=query,
-			category=str(category)
+			category=category
 		)
 	)

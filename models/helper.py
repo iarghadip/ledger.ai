@@ -153,4 +153,4 @@ def run_model(query):
 	version, model, vectorizer, encoder = load_model()
 	X_new = vectorizer.transform([query])
 	pred = model.predict(X_new)
-	return version, encoder.inverse_transform(pred)[0]
+	return version, str(encoder.inverse_transform(pred)[0])
