@@ -41,4 +41,4 @@ if version != 'version_0':
 
 else:
     
-    print(f'Warning: Skipped model training as no older version exists.')
+    print(f'Message: Skipped model training as no older version exists.')

@@ -61,7 +61,7 @@ def create_version():
 		usage = json.load(f_runtime)
 
 		if any(e.get('completed') is False for e in usage):
-			print('Warning: Skipped model queue as a previous version not yet executed.')
+			print('Message: Skipped model queue as a previous version not yet executed.')
 			return
 		
 		used_files = set()
@@ -135,7 +135,7 @@ def revert_model():
     version, folder = resolve_deployed('load')
     
     if not folder.exists():
-        print(f'Warning: Skipped model rollback as no model is currently deployed.')
+        print(f'Message: Skipped model rollback as no model is currently deployed.')
         return
 
     shutil.rmtree(folder)
