@@ -15,7 +15,7 @@ def print_deployed(silent=False):
 	elif not silent:
 		print(f'Success: Deployed model {version} as primary model.')
 
-def resolve_deployed(type):
+def resolve_deployed(type, create=True):
 	
 	number = 0
 	
@@ -33,7 +33,7 @@ def resolve_deployed(type):
 	
 	version = f'version_{number}'
 	folder = Path(__file__).parent / version
-	if type == 'save': os.makedirs(folder, exist_ok=True)
+	if type == 'save' and create: os.makedirs(folder, exist_ok=True)
 
 	return version, folder
 
@@ -59,6 +59,11 @@ def create_version():
 	with open(runtime, 'r', encoding='utf-8') as f_runtime:
 		
 		usage = json.load(f_runtime)
+
+		if any(e.get('completed') is False for e in usage):
+			print('Warning: Skipped model queue as a previous version not yet executed.')
+			return
+		
 		used_files = set()
 		
 		for entry in usage:
@@ -79,7 +84,7 @@ def create_version():
 		if not files_to_use:
 			return
 		
-		version, folder = resolve_deployed('save')
+		version, folder = resolve_deployed('save', False)
 		
 		usage.append(dict(
 			version=version,
@@ -126,28 +131,32 @@ def load_model():
 		return version, model, vectorizer, encoder
 
 def revert_model():
-	
-	version, folder = resolve_deployed('load')
-	
-	if not folder.exists():
-		print(f'Warning: Skipped model rollback as no model is currently deployed.')
-		return
-	
-	shutil.rmtree(folder)
-	
-	runtime = Path(__file__).parent.parent / 'runtime.json'
-	
-	if runtime.exists():
-		with open(runtime, 'r', encoding='utf-8') as f:
-			usage = json.load(f)
-			
-		usage = [entry for entry in usage if entry.get('version') != version]
-		
-		with open(runtime, 'w', encoding='utf-8') as f:
-			json.dump(usage, f, indent=4)
-	
-	print(f'Success: Deleted old model {version} from deployment.')
-	print_deployed()
+    
+    version, folder = resolve_deployed('load')
+    
+    if not folder.exists():
+        print(f'Warning: Skipped model rollback as no model is currently deployed.')
+        return
+
+    shutil.rmtree(folder)
+    
+    runtime = Path(__file__).parent / 'runtime.json'
+    
+    if runtime.exists():
+        with open(runtime, 'r', encoding='utf-8') as f:
+            usage = json.load(f)
+        
+        for entry in usage:
+            if entry.get('version') == version:
+                entry['completed'] = False
+        
+        with open(runtime, 'w', encoding='utf-8') as f:
+            json.dump(usage, f, indent=4)
+    
+    print(f'Success: Reverted model {version} and marked as incomplete in runtime.')
+    
+    if 'print_deployed' in globals():
+        print_deployed()
 
 def run_model(query):
 	version, model, vectorizer, encoder = load_model()

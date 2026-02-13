@@ -6,7 +6,7 @@ import json
 def load_data():
 
     descriptions, categories = [], []
-    runtime = Path(__file__).parent.parent.parent / 'models' / 'runtime.json'
+    runtime = Path(__file__).parent.parent.parent.parent / 'models' / 'runtime.json'
 
     if not runtime.exists():
         return descriptions, categories
@@ -15,7 +15,7 @@ def load_data():
         for e in json.load(f_runtime):
             if not e.get('completed', False):
                 for name in e.get('data'):
-                    data = Path(__file__).parent / 'data' / name
+                    data = Path(__file__).parent / name
                     with open(data, 'r', encoding='utf-8') as f_data:
                         for t in json.load(f_data):
                             descriptions.append(t['Description'].strip().lower())

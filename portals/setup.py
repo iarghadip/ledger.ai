@@ -27,7 +27,7 @@ runtime = Path(__file__).parent.parent / 'models' / 'runtime.json'
 if not runtime.exists():
     
     with open(runtime, 'w', encoding='utf-8') as f:
-        json.dump({}, f, indent=4)
+        json.dump([], f, indent=4)
 
 with open(runtime, 'r', encoding='utf-8') as f:
     data = json.load(f)

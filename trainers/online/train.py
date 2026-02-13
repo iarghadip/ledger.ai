@@ -10,7 +10,7 @@ if version != 'version_0':
     
     descriptions, categories = load_data()
     
-    if len(categories) >= 1000:
+    if len(categories) >= 100:
         
         from models.helper import load_model
         
