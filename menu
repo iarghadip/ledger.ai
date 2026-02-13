@@ -14,8 +14,8 @@ cleanup() {
 trap cleanup EXIT SIGINT SIGTERM SIGHUP
 
 background() {
-    sleep 300
     while true; do
+        sleep 300
         python3 -c 'from models.helper import create_version; create_version()'
         python3 -m 'trainers.online.train'
     done
