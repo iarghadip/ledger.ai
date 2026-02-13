@@ -15,7 +15,7 @@ app.add_exception_handler(RequestValidationError, validation_exception_handler)
 def read_root(
 	query: Annotated[str, Query(min_length=5, max_length=30)]
 ):
-	version, category = run_model(query);
+	version, category = run_model(query)
 	return SuccessResponse(
 		body=dict(
 			version=version,
