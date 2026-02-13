@@ -45,7 +45,7 @@ def save_data(category, amount, description):
     
     buffer.append(dict(
         Category=category,
-        Amount=amount,
+        Amount=int(amount),
         Description=description
     ))
     
