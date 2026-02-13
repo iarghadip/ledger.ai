@@ -131,7 +131,7 @@ def load_model():
 		return version, model, vectorizer, encoder
 
 def revert_model():
-    
+
     version, folder = resolve_deployed('load')
     
     if not folder.exists():
@@ -145,15 +145,13 @@ def revert_model():
     if runtime.exists():
         with open(runtime, 'r', encoding='utf-8') as f:
             usage = json.load(f)
-        
-        for entry in usage:
-            if entry.get('version') == version:
-                entry['completed'] = False
+
+        usage = [entry for entry in usage if entry.get('version') != version]
         
         with open(runtime, 'w', encoding='utf-8') as f:
             json.dump(usage, f, indent=4)
     
-    print(f'Success: Reverted model {version} and marked as incomplete in runtime.')
+    print(f'Success: Reverted model {version} and removed entry from runtime.')
     
     if 'print_deployed' in globals():
         print_deployed()
